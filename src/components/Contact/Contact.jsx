@@ -69,12 +69,14 @@ const Contact = () => {
             </motion.div>
 
             {/* Action Buttons */}
-            <button className="col-span-2 w-full mt-48 text-white py-5 px-10 rounded-lg bg-blue-500 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500">
-              Book a Cab
-            </button>
-            <button className="col-span-2 w-full mt-6 text-white py-5 px-10 rounded-lg bg-blue-500 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500">
-              Plan a Tour
-            </button>
+            <div className="mt-60"> {/* Increased space from cab image */}
+              <button className="col-span-2 w-full text-white py-5 px-10 rounded-lg bg-blue-500 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500">
+                Book a Cab
+              </button>
+              <button className="col-span-2 w-full mt-6 text-white py-5 px-10 rounded-lg bg-blue-500 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500">
+                Plan a Tour
+              </button>
+            </div>
           </div>
         </div>
       </div>
