@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { motion, useMotionValue } from "framer-motion";
+import { motion, useMotionValue, animate } from "framer-motion";
 import Lottie from "lottie-react";
 import { FaWhatsapp } from "react-icons/fa";
 import carDrive from "../../lotties/car-drive.json";
@@ -9,124 +9,122 @@ import carDrive from "../../lotties/car-drive.json";
 const TravelHero = () => {
   const [currentCheckpoint, setCurrentCheckpoint] = useState(0);
   const containerRef = useRef(null);
+  const isDragging = useRef(false);
   const x = useMotionValue(0);
+  const pointerX = useMotionValue(0);
 
-  const checkpoints = [
-    { label: "Book", quote: "Plan your perfect ride" },
-    { label: "Ride", quote: "Enjoy safe & smooth travel" },
-    { label: "Explore", quote: "Discover new destinations" },
-    { label: "Repeat", quote: "Keep coming back!" },
-  ];
+  const [checkpoints] = useState([
+    { leftPercent: 10, quote: "Tread thee forth" },
+    { leftPercent: 30, quote: "Seek new skies" },
+    { leftPercent: 50, quote: "Adventure calls" },
+    { leftPercent: 70, quote: "Come, Lets ride" },
+    { leftPercent: 90, quote: "Fate shall us guide" },
+  ]);
 
-  // Checkpoint updater
+  const carWidth = 140;
+
   useEffect(() => {
-    const unsubscribe = x.on("change", (latestX) => {
-      const container = containerRef.current;
-      if (!container) return;
-
-      const width = container.offsetWidth;
-      const percentage = (latestX / width) * 100;
-
-      if (percentage < 25) setCurrentCheckpoint(0);
-      else if (percentage < 50) setCurrentCheckpoint(1);
-      else if (percentage < 75) setCurrentCheckpoint(2);
-      else setCurrentCheckpoint(3);
+    if (isDragging.current) return;
+    const containerWidth = containerRef.current?.offsetWidth || 0;
+    const left = (checkpoints[currentCheckpoint].leftPercent / 100) * containerWidth - carWidth / 2;
+    animate(x, left, {
+      type: "spring",
+      stiffness: 120,
+      damping: 14,
     });
+    animate(pointerX, left + carWidth / 2 - 18, {
+      type: "spring",
+      stiffness: 120,
+      damping: 14,
+    });
+  }, [currentCheckpoint, checkpoints, x, pointerX]);
 
-    return () => unsubscribe();
-  }, [x]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isDragging.current) {
+        setCurrentCheckpoint((prev) => (prev + 1) % checkpoints.length);
+      }
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [checkpoints]);
 
-  const cloudStyles = [
-    { top: "top-10", left: "left-10", width: "w-20", dir: 1, duration: 20 },
-    { top: "top-20", left: "left-30", width: "w-28", dir: -1, duration: 22 },
-    { top: "top-20", left: "right-8", width: "w-12", dir: -1, duration: 18 },
-  ];
+  const getNearestCheckpointIndex = (absoluteX) => {
+    if (!containerRef.current) return 0;
+    const containerWidth = containerRef.current.offsetWidth;
+    const distances = checkpoints.map((cp) => {
+      const cpX = (cp.leftPercent / 100) * containerWidth;
+      return Math.abs(cpX - absoluteX);
+    });
+    return distances.indexOf(Math.min(...distances));
+  };
+
+  const handleDragEnd = (event, info) => {
+    isDragging.current = false;
+    const containerWidth = containerRef.current?.offsetWidth || 0;
+    const absoluteX = info.point.x;
+    const nearestIndex = getNearestCheckpointIndex(absoluteX);
+    setCurrentCheckpoint(nearestIndex);
+    if (typeof window !== "undefined" && window.navigator.vibrate) {
+      window.navigator.vibrate(50);
+    }
+  };
 
   return (
     <div
+      className="relative w-full h-[520px] sm:h-[600px] md:h-[650px] overflow-hidden font-sans bg-gradient-to-br from-sky-200 via-yellow-100 to-orange-100"
       ref={containerRef}
-      className="relative w-full h-[90vh] overflow-hidden flex justify-center items-center bg-gradient-to-b from-orange-100 to-blue-100 dark:from-gray-900 dark:to-black transition-colors duration-500"
     >
-      {/* Title + subtitle */}
-      <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-10 text-center">
-        <h1 className="text-4xl md:text-6xl font-bold text-black dark:text-white">
-          Horizon Trails
-        </h1>
-        <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 mt-2">
-          {checkpoints[currentCheckpoint].label}
-        </p>
-      </div>
+      {/* Rising Sun */}
+      <motion.div
+        className="absolute bottom-28 left-1/2 -translate-x-1/2 w-48 h-48 rounded-full bg-gradient-to-br from-red-500 via-orange-400 to-yellow-300 shadow-[0_0_80px_30px_rgba(255,100,50,0.5)] z-0"
+        initial={{ scale: 0, opacity: 0, y: 50 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        transition={{ duration: 6, ease: "easeOut" }}
+      />
 
-      {/* Floating clouds */}
-      {cloudStyles.map((cloud, idx) => (
+
+      {/* Moving Clouds */}
+      {["https://cdn-icons-png.flaticon.com/512/414/414927.png", "https://cdn-icons-png.flaticon.com/512/414/414927.png"].map((src, idx) => (
         <motion.img
           key={idx}
-          src="https://cdn-icons-png.flaticon.com/512/414/414927.png"
+          src={src}
           alt="Cloud"
-          className={`absolute ${cloud.top} ${cloud.left} ${cloud.width} opacity-60`}
-          animate={{ x: [0, 100 * cloud.dir, 0] }}
-          transition={{ duration: cloud.duration, repeat: Infinity, ease: "linear" }}
+          className={`absolute top-${10 + idx * 10} left-${10 + idx * 20} w-${20 + idx * 10} opacity-60`}
+          animate={{ x: [0, 100 * (idx % 2 === 0 ? 1 : -1), 0] }}
+          transition={{ duration: 20 + idx * 2, repeat: Infinity, ease: "linear" }}
         />
       ))}
 
-      {/* Airplane */}
+      {/* Additional Small Clouds on Right */}
+      <motion.img
+        src="https://cdn-icons-png.flaticon.com/512/414/414927.png"
+        alt="Small Cloud"
+        className="absolute top-20 right-8 w-12 opacity-50"
+        animate={{ x: [0, -80, 0] }}
+        transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+      />
+
+      {/* ✈️ Airplane Flyby */}
       <motion.img
         src="/airplane.png"
-        alt="Flying Airplane"
-        className="absolute top-10 left-[-120px] w-20 z-1"
+        alt="Plane"
+        className="absolute top-10 left-[-120px] w-20 opacity-100 z-1"
         animate={{ x: ["-120px", "100vw"] }}
         transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
       />
 
+
       {/* Balloon */}
       <motion.img
         src="/ballon.png"
-        alt="Hot Air Balloon"
-        className="absolute bottom-80 left-12 w-48 z-1"
+        alt="Balloon"
+        className="absolute bottom-80 left-12 w-200 z-1"
         animate={{ y: [0, -20, 0] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* CTA Heading */}
-      <motion.div
-        initial={{ y: -60, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 80, damping: 10 }}
-        className="absolute top-[5%] left-0 w-full flex flex-col items-center text-center z-0 px-4"
-      >
-        <motion.h1
-          className="text-2xl sm:text-4xl md:text-5xl font-extrabold mb-2 tracking-wide text-black px-6 py-2 rounded-xl"
-          style={{
-            textShadow:
-              "-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff",
-          }}
-        >
-          Your Next <span className="text-red-500">Adventure</span> Awaits!
-        </motion.h1>
-        <motion.p
-          className="hidden md:block text-sm sm:text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200 mb-4 max-w-[70%] lg:max-w-[50%] leading-relaxed"
-          animate={{ y: [0, -4, 0] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-        >
-          Unleash bold journeys. Embrace colors. Feel the freedom.
-        </motion.p>
-        <motion.a
-          href="https://wa.me/918822016566"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Chat with us on WhatsApp"
-          whileHover={{ scale: 1.1 }}
-          animate={{ y: [0, -5, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-          className="bg-green-500 text-white flex items-center gap-2 px-4 py-2 rounded-full shadow-lg z-0 cursor-pointer"
-        >
-          <FaWhatsapp className="text-xl" />
-          <span className="font-semibold text-sm sm:text-base">Chat on WhatsApp</span>
-        </motion.a>
-      </motion.div>
-
       {/* Road */}
-      <div className="absolute bottom-0 w-full h-44 bg-black z-0 overflow-hidden">
+      <motion.div className="absolute bottom-0 w-full h-44 bg-black z-0 overflow-hidden">
         <motion.div
           className="absolute w-full h-[10px] bottom-[90px]"
           style={{
@@ -137,28 +135,17 @@ const TravelHero = () => {
           animate={{ backgroundPositionX: ["0px", "-120px"] }}
           transition={{ duration: 1.5, ease: "linear", repeat: Infinity }}
         />
-      </div>
-
-      {/* Car Lottie */}
-      <motion.div
-        className="absolute z-10 w-[140px] sm:w-[200px] md:w-[280px] lg:w-[360px] touch-none drop-shadow-[0_8px_12px_rgba(0,0,0,0.4)]"
-        style={{ x, bottom: "78px" }}
-        drag="x"
-        dragConstraints={containerRef}
-        dragElastic={0.2}
-      >
-        <Lottie animationData={carDrive} loop autoplay />
       </motion.div>
 
-      {/* Checkpoint dots and tooltips */}
-      {checkpoints.map((cp, idx) => {
-        const leftPercent = 10 + idx * 25;
+      {/* Checkpoints */}
+      {checkpoints.map((pos, idx) => {
+        const left = `${pos.leftPercent}%`;
         return (
           <div key={idx}>
             <div
               className={`absolute w-4 sm:w-5 h-4 sm:h-5 rounded-full border-white border-2 z-0 transition-transform duration-500 ${idx === currentCheckpoint ? "bg-green-500 scale-125" : "bg-red-500"
                 }`}
-              style={{ left: `${leftPercent}%`, bottom: "240px" }}
+              style={{ left, bottom: "240px" }}
             />
             {idx === currentCheckpoint && (
               <>
@@ -167,7 +154,7 @@ const TravelHero = () => {
                   animate={{ scale: 1.4, opacity: 1 }}
                   transition={{ duration: 0.4, type: "spring" }}
                   className="absolute z-0"
-                  style={{ left: `calc(${leftPercent}% - 8px)`, bottom: "255px" }}
+                  style={{ left: `calc(${left} - 8px)`, bottom: "255px" }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -183,21 +170,80 @@ const TravelHero = () => {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 100, damping: 10 }}
-                  className="absolute text-xs sm:text-sm md:text-base italic font-bold text-black text-center py-2 bg-white/90 rounded-md shadow z-0"
+                  className={`absolute text-xs sm:text-sm md:text-base italic font-bold text-black text-center py-2 bg-white/90 rounded-md shadow z-0 ${idx === 0 || idx === checkpoints.length - 1 ? "px-4" : "px-3"
+                    }`}
                   style={{
-                    left: `calc(${leftPercent}% - 90px)`,
+                    left:
+                      idx === 0 || idx === checkpoints.length - 1
+                        ? `calc(${left} - 40px)`
+                        : `calc(${left} - 90px)`,
                     bottom: "300px",
-                    width: "180px",
+                    width: idx === 0 || idx === checkpoints.length - 1 ? "auto" : "180px",
                     whiteSpace: "nowrap",
                   }}
                 >
-                  “{cp.quote}”
+                  “{pos.quote}”
                 </motion.div>
+
               </>
             )}
           </div>
         );
       })}
+
+      {/* Car */}
+      <motion.div
+        className="absolute z-0 w-[140px] sm:w-[200px] md:w-[280px] lg:w-[360px] touch-none drop-shadow-[0_8px_12px_rgba(0,0,0,0.4)]"
+        style={{ x, bottom: "78px" }}
+        drag="x"
+        dragConstraints={containerRef}
+        dragElastic={0.3}
+        onDragStart={() => (isDragging.current = true)}
+        onDragEnd={handleDragEnd}
+      >
+        <Lottie animationData={carDrive} loop className="w-full" />
+      </motion.div>
+
+      {/* Header & CTA */}
+      <motion.div
+        initial={{ y: -60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 80, damping: 10 }}
+        className="absolute top-[5%] left-0 w-full flex flex-col items-center text-center z-0 px-4"
+      >
+        <motion.h1
+          className="text-2xl sm:text-4xl md:text-5xl font-extrabold mb-2 tracking-wide text-black px-6 py-2 rounded-xl"
+          style={{
+            textShadow:
+              "-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff",
+          }}
+        >
+          Your Next <span className="text-red-500">Adventure</span> Awaits!
+        </motion.h1>
+
+        {/* ✅ Paragraph shown only on medium screens and above */}
+        <motion.p
+          className="hidden md:block text-sm sm:text-lg md:text-xl font-medium text-gray-800 drop-shadow-sm mb-4 max-w-[70%] lg:max-w-[50%] leading-relaxed"
+          animate={{ y: [0, -4, 0] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+        >
+          Unleash bold journeys. Embrace colors. Feel the freedom.
+        </motion.p>
+
+        <motion.a
+          href="https://wa.me/918822016566"
+          target="_blank"
+          rel="noopener noreferrer"
+          whileHover={{ scale: 1.1 }}
+          animate={{ y: [0, -5, 0] }}
+          transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+          className="bg-green-500 text-white flex items-center gap-2 px-4 py-2 rounded-full shadow-lg z-0 cursor-pointer"
+        >
+          <FaWhatsapp className="text-xl" />
+          <span className="font-semibold text-sm sm:text-base">Chat on WhatsApp</span>
+        </motion.a>
+      </motion.div>
+
     </div>
   );
 };
