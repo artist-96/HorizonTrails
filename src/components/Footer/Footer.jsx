@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import {
   FaAndroid,
@@ -39,7 +40,7 @@ const socialLinks = [
 const Footer = () => {
   return (
     <div className="bg-white text-black dark:bg-black dark:text-white">
-      {/* upper section Banner */}
+      {/* Upper Banner Section */}
       <div className="bg-primary">
         <div className="container text-black text-center py-10 lg:py-14 text-2xl font-bold space-y-4">
           <p>
@@ -49,7 +50,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Bottom Footer section */}
+      {/* Bottom Footer Section */}
       <div className="container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 md:gap-20 py-12">
         {/* About Section */}
         <div className="space-y-6 max-w-prose">
@@ -57,7 +58,7 @@ const Footer = () => {
             About Horizon Trails
           </h1>
           <p>
-            Horizon Trails offers reliable, comfortable, and professional transportation for every occasion. From airport transfers and city rides to customized tours, we ensure a smooth, hassle-free experience with courteous drivers and well-maintained vehicles. Whether you're a local or a visitor, we&apos;re here to get you where you need to go—safely, on time, and in style.
+            Horizon Trails offers reliable, comfortable, and professional transportation for every occasion. From airport transfers and city rides to customized tours, we ensure a smooth, hassle-free experience with courteous drivers and well-maintained vehicles. Whether you&apos;re a local or a visitor, we&apos;re here to get you where you need to go—safely, on time, and in style.
           </p>
 
           {/* Social Icons */}
@@ -86,15 +87,11 @@ const Footer = () => {
           <p>App under development</p>
           <h1 className="text-primary text-xl font-semibold flex items-center gap-4">
             Android user
-            <span>
-              <FaAndroid className="text-2xl text-black dark:text-white" />
-            </span>
+            <FaAndroid className="text-2xl text-black dark:text-white" />
           </h1>
           <h1 className="text-primary text-xl font-semibold flex items-center gap-4">
-            IOS user
-            <span>
-              <FaAppStoreIos className="text-2xl text-black dark:text-white" />
-            </span>
+            iOS user
+            <FaAppStoreIos className="text-2xl text-black dark:text-white" />
           </h1>
         </div>
 
@@ -111,7 +108,8 @@ const Footer = () => {
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <MdCall /> +91 7637838415
+              <MdCall />
+              <span>+91 7637838415</span>
             </div>
             <div className="flex items-center gap-4">
               <MdEmail />
@@ -133,8 +131,9 @@ const Footer = () => {
         </div>
       </div>
 
+      {/* Copyright */}
       <p className="text-center py-4 text-sm">
-        &copy; 2025. All rights reserved.
+        &copy; {new Date().getFullYear()}. All rights reserved.
       </p>
     </div>
   );
