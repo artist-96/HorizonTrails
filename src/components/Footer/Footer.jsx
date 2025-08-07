@@ -53,7 +53,7 @@ const Footer = () => {
             About Horizon Trails
           </h1>
           <p>
-            Horizon Trails offers reliable, comfortable, and professional transportation for every occasion. From airport transfers and city rides to customized tours, we ensure a smooth, hassle-free experience with courteous drivers and well-maintained vehicles. Whether you're a local or a visitor, we’re here to get you where you need to go—safely, on time, and in style.
+            Horizon Trails offers reliable, comfortable, and professional transportation for every occasion. From airport transfers and city rides to customized tours, we ensure a smooth, hassle-free experience with courteous drivers and well-maintained vehicles. Whether you're a local or a visitor, we're here to get you where you need to go—safely, on time, and in style.
           </p>
 
           {/* clickable and animated social links */}
