@@ -57,14 +57,10 @@ const Footer = () => {
             About Horizon Trails
           </h1>
           <p>
-<<<<<<< HEAD
-            Horizon Trails offers reliable, comfortable, and professional transportation for every occasion. From airport transfers and city rides to customized tours, we ensure a smooth, hassle-free experience with courteous drivers and well-maintained vehicles. Whether you're a local or a visitor, we're here to get you where you need to go—safely, on time, and in style.
-=======
-            Horizon Trails offers reliable, comfortable, and professional transportation for every occasion. From airport transfers and city rides to customized tours, we ensure a smooth, hassle-free experience with courteous drivers and well-maintained vehicles. Whether you&apos;re a local or a visitor, we’re here to get you where you need to go—safely, on time, and in style.
->>>>>>> 0bddf8b (first commit)
+            Horizon Trails offers reliable, comfortable, and professional transportation for every occasion. From airport transfers and city rides to customized tours, we ensure a smooth, hassle-free experience with courteous drivers and well-maintained vehicles. Whether you're a local or a visitor, we&apos;re here to get you where you need to go—safely, on time, and in style.
           </p>
 
-          {/* Social Icons with aria-label */}
+          {/* Social Icons */}
           <div className="flex items-center gap-4 text-2xl text-primary">
             {socialLinks.map((item, index) => (
               <motion.a
@@ -102,7 +98,7 @@ const Footer = () => {
           </h1>
         </div>
 
-        {/* Contact Section with address tag */}
+        {/* Contact Section */}
         <div className="space-y-6">
           <h1 className="text-2xl py-3 font-bold uppercase border-b-8 border-primary">
             Contact Us
@@ -138,7 +134,7 @@ const Footer = () => {
       </div>
 
       <p className="text-center py-4 text-sm">
-        Copyright © 2025. All rights reserved
+        &copy; 2025. All rights reserved.
       </p>
     </div>
   );
