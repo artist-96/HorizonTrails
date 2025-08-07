@@ -25,10 +25,10 @@ const ServicesData = [
     name: "Tour Packages",
     description:
       "Explore new destinations with comfort and peace of mind. Our tours and outstation services are perfect for weekend getaways, sightseeing trips, and long-distance travel—driven by experienced professionals you can trust.",
-    description2 : "",
     aosDelay: "500",
   },
 ];
+
 const BestCabs = () => {
   return (
     <div className="py-10 bg-white dark:bg-dark text-black dark:text-white">
@@ -58,18 +58,20 @@ const BestCabs = () => {
                     className="max-w-[200px] block mx-auto transform -translate-y-20 group-hover:scale-110 group-hover:translate-x-4 duration-300"
                   />
                 </div>
+
                 {/* text content section */}
                 <div className="p-4 text-center space-y-4">
                   <h1 className="text-xl font-bold">{name}</h1>
                   <p className="text-gray-500 group-hover:text-black duration-300 text-sm line-clamp-2">
                     {description}
                   </p>
-                  {<p className="text-primary text-2xl font-bold group-hover:text-black">
-                  
-                  </p>}
-                  <button className="bg-black text-white px-4 py-2 rounded-lg">
-                    Call Us
-                  </button>
+                  {<p className="text-primary text-2xl font-bold group-hover:text-black"></p>}
+                  {/* “Call Us” button triggers the phone call */}
+                  <a href="tel:+917637838415">
+                    <button className="bg-black text-white px-4 py-2 rounded-lg">
+                      Call Us
+                    </button>
+                  </a>
                 </div>
               </div>
             );

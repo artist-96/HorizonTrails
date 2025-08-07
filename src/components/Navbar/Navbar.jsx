@@ -5,6 +5,7 @@ import DarkMode from "./DarkMode";
 import { HiMenuAlt3, HiMenuAlt1 } from "react-icons/hi";
 import ResponsiveMenu from "./ResponsiveMenu";
 import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const Navlinks = [
   { id: 1, name: "Home", link: "/" },
@@ -17,6 +18,7 @@ export const Navlinks = [
 const Navbar = () => {
   const pathname = usePathname();
   const [showMenu, setShowMenu] = React.useState(false);
+  const [hoveredId, setHoveredId] = React.useState(null);
   const toggleMenu = () => setShowMenu(!showMenu);
 
   return (
@@ -26,7 +28,7 @@ const Navbar = () => {
           {/* Logo Section */}
           <Link href="/" className="flex flex-col leading-tight group">
             <span className="text-3xl font-extrabold text-black dark:text-white">
-              Super<span className="text-primary">Cabs</span>
+              Horizon <span className="text-primary">Trails</span>
             </span>
             <span className="text-sm sm:text-base font-medium text-gray-600 group-hover:text-primary dark:text-gray-300">
               Tours and Travel
@@ -35,15 +37,51 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:block">
-            <ul className="flex items-center gap-6">
+            <ul className="relative flex items-center gap-6">
+              {/* Glowing animated background pill */}
+              <AnimatePresence>
+                {hoveredId !== null && (
+                  <motion.div
+                    key="hover-indicator"
+                    layoutId="hover-indicator"
+                    className="absolute rounded-full bg-primary/80 shadow-[0_0_25px_rgba(251,191,36,0.6)] h-10 -z-10 transition-all"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    style={{
+                      top: "50%",
+                      left: hoveredId.left,
+                      width: hoveredId.width,
+                      transform: "translateY(-50%)",
+                    }}
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* Navigation links */}
               {Navlinks.map(({ id, name, link }) => {
                 const isActive = pathname === link;
                 return (
-                  <li key={id}>
+                  <li
+                    key={id}
+                    onMouseEnter={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const container = e.currentTarget.offsetParent;
+                      const left =
+                        rect.left - container.getBoundingClientRect().left;
+                      setHoveredId({ left, width: rect.width });
+                    }}
+                    onMouseLeave={() => setHoveredId(null)}
+                    className="relative z-10"
+                  >
                     <Link
                       href={link}
-                      className={`${isActive ? "bg-primary dark:text-black" : ""
-                        } text-lg font-medium text-black dark:text-white py-2 px-4 rounded-full hover:bg-primary duration-300`}
+                      className={`
+                        text-lg font-medium py-2 px-4 rounded-full transition-colors duration-300
+                        ${isActive ? "bg-primary text-black" : ""}
+                        hover:text-black dark:hover:text-black
+                      `}
                     >
                       {name}
                     </Link>
@@ -58,9 +96,17 @@ const Navbar = () => {
           <div className="md:hidden flex items-center gap-4">
             <DarkMode />
             {showMenu ? (
-              <HiMenuAlt1 onClick={toggleMenu} className="cursor-pointer" size={30} />
+              <HiMenuAlt1
+                onClick={toggleMenu}
+                className="cursor-pointer"
+                size={30}
+              />
             ) : (
-              <HiMenuAlt3 onClick={toggleMenu} className="cursor-pointer" size={30} />
+              <HiMenuAlt3
+                onClick={toggleMenu}
+                className="cursor-pointer"
+                size={30}
+              />
             )}
           </div>
         </div>

@@ -21,7 +21,7 @@ const AppStore = () => {
             data-aos-delay="300"
             className="text-3xl font-bold "
           >
-            Super Cabs
+            
           </h1>
         </div>
 

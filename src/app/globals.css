@@ -7,5 +7,28 @@
     @apply px-5 py-1 mb-4 border-b-2 border-gray-300 ring-0 focus:ring-0 focus:outline-none;
   }
 }
+/* Add to globals.css */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+@keyframes waveBg {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-waveBg {
+  animation: waveBg 10s ease-in-out infinite;
+  background-size: 400% 400%;
+}
+
+
 
 

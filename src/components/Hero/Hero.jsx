@@ -1,123 +1,251 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import bgCity1 from "../../assets/city1.jpg";
-import bgCity2 from "../../assets/city2.jpg";
-import bgCity3 from "../../assets/city3.jpg";
-import bgCity4 from "../../assets/city4.jpg";
-import bgCity5 from "../../assets/city5.jpg";
-import { FaChevronLeft, FaChevronRight, FaWhatsapp } from "react-icons/fa";
+import React, { useEffect, useState, useRef } from "react";
+import { motion, useMotionValue, animate } from "framer-motion";
+import Lottie from "lottie-react";
+import { FaWhatsapp } from "react-icons/fa";
+import carDrive from "../../lotties/car-drive.json";
 
-const Hero = () => {
-  const [currentBgIndex, setCurrentBgIndex] = useState(0);
-  const slideIntervalRef = useRef(null);
+const TravelHero = () => {
+  const [currentCheckpoint, setCurrentCheckpoint] = useState(0);
+  const containerRef = useRef(null);
+  const isDragging = useRef(false);
+  const x = useMotionValue(0);
+  const pointerX = useMotionValue(0);
 
-  const backgroundImages = [bgCity1, bgCity2, bgCity3, bgCity4, bgCity5];
+  const [checkpoints] = useState([
+    { leftPercent: 10, quote: "Tread thee forth" },
+    { leftPercent: 30, quote: "Seek new skies" },
+    { leftPercent: 50, quote: "Adventure calls" },
+    { leftPercent: 70, quote: "Come, Lets ride" },
+    { leftPercent: 90, quote: "Fate shall us guide" },
+  ]);
 
-  const startAutoSlide = () => {
-    slideIntervalRef.current = setInterval(() => {
-      setCurrentBgIndex((prevIndex) =>
-        prevIndex === backgroundImages.length - 1 ? 0 : prevIndex + 1
-      );
-    }, 5000);
-  };
+  const carWidth = 140;
 
   useEffect(() => {
-    startAutoSlide();
-    return () => clearInterval(slideIntervalRef.current);
-  }, []);
+    if (isDragging.current) return;
+    const containerWidth = containerRef.current?.offsetWidth || 0;
+    const left = (checkpoints[currentCheckpoint].leftPercent / 100) * containerWidth - carWidth / 2;
+    animate(x, left, {
+      type: "spring",
+      stiffness: 120,
+      damping: 14,
+    });
+    animate(pointerX, left + carWidth / 2 - 18, {
+      type: "spring",
+      stiffness: 120,
+      damping: 14,
+    });
+  }, [currentCheckpoint, checkpoints, x, pointerX]);
 
-  const goToPrev = () => {
-    clearInterval(slideIntervalRef.current);
-    setCurrentBgIndex((prevIndex) =>
-      prevIndex === 0 ? backgroundImages.length - 1 : prevIndex - 1
-    );
-    startAutoSlide();
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isDragging.current) {
+        setCurrentCheckpoint((prev) => (prev + 1) % checkpoints.length);
+      }
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [checkpoints]);
+
+  const getNearestCheckpointIndex = (absoluteX) => {
+    if (!containerRef.current) return 0;
+    const containerWidth = containerRef.current.offsetWidth;
+    const distances = checkpoints.map((cp) => {
+      const cpX = (cp.leftPercent / 100) * containerWidth;
+      return Math.abs(cpX - absoluteX);
+    });
+    return distances.indexOf(Math.min(...distances));
   };
 
-  const goToNext = () => {
-    clearInterval(slideIntervalRef.current);
-    setCurrentBgIndex((prevIndex) =>
-      prevIndex === backgroundImages.length - 1 ? 0 : prevIndex + 1
-    );
-    startAutoSlide();
+  const handleDragEnd = (event, info) => {
+    isDragging.current = false;
+    const containerWidth = containerRef.current?.offsetWidth || 0;
+    const absoluteX = info.point.x;
+    const nearestIndex = getNearestCheckpointIndex(absoluteX);
+    setCurrentCheckpoint(nearestIndex);
+    if (typeof window !== "undefined" && window.navigator.vibrate) {
+      window.navigator.vibrate(50);
+    }
   };
 
   return (
-    <div className="relative w-screen h-[520px] overflow-hidden">
-      {/* Background Sliding Track */}
-      <div
-        className="flex transition-transform duration-700 ease-in-out h-full"
-        style={{
-          width: `${backgroundImages.length * 100}vw`,
-          transform: `translateX(-${currentBgIndex * 100}vw)`,
-        }}
-      >
-        {backgroundImages.map((bg, index) => (
-          <div
-            key={index}
-            className="w-screen h-full bg-cover bg-center bg-no-repeat flex-shrink-0"
-            style={{ backgroundImage: `url(${bg.src})` }}
-          />
-        ))}
-      </div>
+    <div
+      className="relative w-full h-[520px] sm:h-[600px] md:h-[650px] overflow-hidden font-sans bg-gradient-to-br from-sky-200 via-yellow-100 to-orange-100"
+      ref={containerRef}
+    >
+      {/* Rising Sun */}
+      <motion.div
+        className="absolute bottom-28 left-1/2 -translate-x-1/2 w-48 h-48 rounded-full bg-gradient-to-br from-red-500 via-orange-400 to-yellow-300 shadow-[0_0_80px_30px_rgba(255,100,50,0.5)] z-0"
+        initial={{ scale: 0, opacity: 0, y: 50 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        transition={{ duration: 6, ease: "easeOut" }}
+      />
 
-      {/* Overlay Content */}
-      <div className="absolute top-0 left-0 w-full h-full dark:bg-black/60 bg-white/80 dark:text-white duration-300 flex items-center justify-center">
-        <div className="text-center space-y-5 px-4">
-          <p
-            className="text-primary text-3xl font-semibold uppercase drop-shadow-md"
-            data-aos="fade-up"
-          >
-            BOOK YOUR RIDE
-          </p>
 
-          <a
-            href="https://wa.me/917637838415"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-4 bg-green-600 rounded-full px-6 py-4 shadow-lg hover:shadow-[0_0_15px_4px_rgba(22,163,74,0.8)] transition-all duration-300 transform hover:scale-105"
-            data-aos="fade-up"
-            data-aos-delay="600"
-          >
-            <FaWhatsapp
-              size={48}
-              className="text-white animate-bounce"
-              aria-hidden="true"
+      {/* Moving Clouds */}
+      {["https://cdn-icons-png.flaticon.com/512/414/414927.png", "https://cdn-icons-png.flaticon.com/512/414/414927.png"].map((src, idx) => (
+        <motion.img
+          key={idx}
+          src={src}
+          alt="Cloud"
+          className={`absolute top-${10 + idx * 10} left-${10 + idx * 20} w-${20 + idx * 10} opacity-60`}
+          animate={{ x: [0, 100 * (idx % 2 === 0 ? 1 : -1), 0] }}
+          transition={{ duration: 20 + idx * 2, repeat: Infinity, ease: "linear" }}
+        />
+      ))}
+
+      {/* Additional Small Clouds on Right */}
+      <motion.img
+        src="https://cdn-icons-png.flaticon.com/512/414/414927.png"
+        alt="Small Cloud"
+        className="absolute top-20 right-8 w-12 opacity-50"
+        animate={{ x: [0, -80, 0] }}
+        transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+      />
+
+      {/* ✈️ Airplane Flyby */}
+      <motion.img
+        src="/airplane.png"
+        alt="Plane"
+        className="absolute top-10 left-[-120px] w-20 opacity-100 z-1"
+        animate={{ x: ["-120px", "100vw"] }}
+        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+      />
+
+
+      {/* Balloon */}
+      <motion.img
+        src="/ballon.png"
+        alt="Balloon"
+        className="absolute bottom-80 left-12 w-200 z-1"
+        animate={{ y: [0, -20, 0] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* Road */}
+      <motion.div className="absolute bottom-0 w-full h-44 bg-black z-0 overflow-hidden">
+        <motion.div
+          className="absolute w-full h-[10px] bottom-[90px]"
+          style={{
+            backgroundImage: "repeating-linear-gradient(to right, white 0 80px, transparent 80px 120px)",
+            backgroundRepeat: "repeat-x",
+            backgroundSize: "120px 100%",
+          }}
+          animate={{ backgroundPositionX: ["0px", "-120px"] }}
+          transition={{ duration: 1.5, ease: "linear", repeat: Infinity }}
+        />
+      </motion.div>
+
+      {/* Checkpoints */}
+      {checkpoints.map((pos, idx) => {
+        const left = `${pos.leftPercent}%`;
+        return (
+          <div key={idx}>
+            <div
+              className={`absolute w-4 sm:w-5 h-4 sm:h-5 rounded-full border-white border-2 z-0 transition-transform duration-500 ${idx === currentCheckpoint ? "bg-green-500 scale-125" : "bg-red-500"
+                }`}
+              style={{ left, bottom: "240px" }}
             />
-            <span className="text-white text-4xl md:text-6xl font-bold select-none drop-shadow-lg">
-              +91 7637838415
-            </span>
-          </a>
+            {idx === currentCheckpoint && (
+              <>
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1.4, opacity: 1 }}
+                  transition={{ duration: 0.4, type: "spring" }}
+                  className="absolute z-0"
+                  style={{ left: `calc(${left} - 8px)`, bottom: "255px" }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="36"
+                    height="36"
+                    viewBox="0 0 24 24"
+                    style={{ fill: "red" }}
+                  >
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5z" />
+                  </svg>
+                </motion.div>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 100, damping: 10 }}
+                  className={`absolute text-xs sm:text-sm md:text-base italic font-bold text-black text-center py-2 bg-white/90 rounded-md shadow z-0 ${idx === 0 || idx === checkpoints.length - 1 ? "px-4" : "px-3"
+                    }`}
+                  style={{
+                    left:
+                      idx === 0 || idx === checkpoints.length - 1
+                        ? `calc(${left} - 40px)`
+                        : `calc(${left} - 90px)`,
+                    bottom: "300px",
+                    width: idx === 0 || idx === checkpoints.length - 1 ? "auto" : "180px",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  “{pos.quote}”
+                </motion.div>
 
-          <p
-            className="tracking-[8px] text-base sm:text-xl font-semibold drop-shadow-sm"
-            data-aos="fade-up"
-            data-aos-delay="1000"
-          >
-            www.supercabs.co
-          </p>
-        </div>
-      </div>
+              </>
+            )}
+          </div>
+        );
+      })}
 
-      {/* Navigation Arrows */}
-      <button
-        onClick={goToPrev}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full"
-        aria-label="Previous image"
+      {/* Car */}
+      <motion.div
+        className="absolute z-0 w-[140px] sm:w-[200px] md:w-[280px] lg:w-[360px] touch-none drop-shadow-[0_8px_12px_rgba(0,0,0,0.4)]"
+        style={{ x, bottom: "78px" }}
+        drag="x"
+        dragConstraints={containerRef}
+        dragElastic={0.3}
+        onDragStart={() => (isDragging.current = true)}
+        onDragEnd={handleDragEnd}
       >
-        <FaChevronLeft size={24} />
-      </button>
+        <Lottie animationData={carDrive} loop className="w-full" />
+      </motion.div>
 
-      <button
-        onClick={goToNext}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full"
-        aria-label="Next image"
+      {/* Header & CTA */}
+      <motion.div
+        initial={{ y: -60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 80, damping: 10 }}
+        className="absolute top-[5%] left-0 w-full flex flex-col items-center text-center z-0 px-4"
       >
-        <FaChevronRight size={24} />
-      </button>
+        <motion.h1
+          className="text-2xl sm:text-4xl md:text-5xl font-extrabold mb-2 tracking-wide text-black px-6 py-2 rounded-xl"
+          style={{
+            textShadow:
+              "-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff",
+          }}
+        >
+          Your Next <span className="text-red-500">Adventure</span> Awaits!
+        </motion.h1>
+
+        {/* ✅ Paragraph shown only on medium screens and above */}
+        <motion.p
+          className="hidden md:block text-sm sm:text-lg md:text-xl font-medium text-gray-800 drop-shadow-sm mb-4 max-w-[70%] lg:max-w-[50%] leading-relaxed"
+          animate={{ y: [0, -4, 0] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+        >
+          Unleash bold journeys. Embrace colors. Feel the freedom.
+        </motion.p>
+
+        <motion.a
+          href="https://wa.me/918822016566"
+          target="_blank"
+          rel="noopener noreferrer"
+          whileHover={{ scale: 1.1 }}
+          animate={{ y: [0, -5, 0] }}
+          transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+          className="bg-green-500 text-white flex items-center gap-2 px-4 py-2 rounded-full shadow-lg z-0 cursor-pointer"
+        >
+          <FaWhatsapp className="text-xl" />
+          <span className="font-semibold text-sm sm:text-base">Chat on WhatsApp</span>
+        </motion.a>
+      </motion.div>
+
     </div>
   );
 };
 
-export default Hero;
+export default TravelHero;

@@ -3,30 +3,40 @@ import React, { useState, useEffect } from "react";
 import { BiSolidSun, BiSolidMoon } from "react-icons/bi";
 
 const DarkMode = () => {
-  const [theme, setTheme] = useState(
-    typeof window !== "undefined" && localStorage.getItem("theme")
-      ? localStorage.getItem("theme")
-      : "light"
-  );
-
-  const element =
-    typeof document !== "undefined" ? document.documentElement : null;
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme") || "dark"; // Set default to dark
+    }
+    return "dark";
+  });
 
   useEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+
+    const element = document.documentElement;
     localStorage.setItem("theme", theme);
+
     if (theme === "dark") {
       element.classList.add("dark");
-    } else {
       element.classList.remove("light");
+    } else {
       element.classList.remove("dark");
+      element.classList.remove("light");
     }
-  });
+  }, [theme]); // Only run when theme changes
+
   return (
     <>
       {theme === "dark" ? (
-        <BiSolidSun onClick={() => setTheme("light")} className="text-2xl" />
+        <BiSolidSun
+          onClick={() => setTheme("light")}
+          className="text-2xl cursor-pointer"
+        />
       ) : (
-        <BiSolidMoon onClick={() => setTheme("dark")} className="text-2xl" />
+        <BiSolidMoon
+          onClick={() => setTheme("dark")}
+          className="text-2xl cursor-pointer"
+        />
       )}
     </>
   );

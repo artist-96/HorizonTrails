@@ -1,4 +1,4 @@
-"use client";  // <---- Add this line at the top
+"use client";
 
 import React from "react";
 import { motion } from "framer-motion";
@@ -7,12 +7,15 @@ import yellowCab from "../../assets/yellow-cab.png";
 
 const Contact = () => {
   return (
-    <div className="bg-primary text-black sm:min-h-[600px] sm:grid sm:place-items-center duration-300 pt-24 pb-10 sm:pb-0">
-      <div className="container">
-        <div className="grid grid-cols-1 sm:grid-cols-2 place-items-center relative">
-          
+    <div className="relative text-black sm:min-h-[600px] sm:grid sm:place-items-center duration-300 pt-24 pb-10 sm:pb-0 overflow-hidden">
+      {/* Background Sunset Gradient - Lightened */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#FFF1DC] via-[#FFD9C0] to-[#FFC0CB]" />
+
+      <div className="container relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 place-items-center">
+
           {/* Left Text Content Section */}
-          <div className="space-y-5 sm:p-16 pb-6 z-10">
+          <div className="space-y-5 sm:p-16 pb-6">
             <h1 data-aos="fade-up" className="text-2xl sm:text-3xl font-bold">
               Best In City
             </h1>
@@ -35,17 +38,23 @@ const Contact = () => {
                 top priority! 🌿🚖✨
               </b>
             </p>
-            <button
-              data-aos="fade-up"
-              data-aos-offset="0"
-              className="bg-black text-white px-4 py-2 rounded-lg"
+            <a
+              href="https://wa.me/917637838415"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              Book Now
-            </button>
+              <button
+                data-aos="fade-up"
+                data-aos-offset="0"
+                className="bg-black text-white px-4 py-2 rounded-lg transition duration-150 hover:bg-gray-800 active:bg-gray-900"
+              >
+                Book Now
+              </button>
+            </a>
           </div>
 
           {/* Right Side Form Section */}
-          <div className="w-full md:max-w-[350px] mx-auto relative z-10">
+          <div className="w-full md:max-w-[350px] mx-auto relative">
             {/* Animated Cab Image */}
             <motion.div
               className="absolute -top-28 left-0 sm:-left-20 sm:-top-36"
@@ -65,17 +74,30 @@ const Contact = () => {
                 src={yellowCab}
                 alt="Yellow Cab"
                 className="w-[550px] sm:w-[600px]"
+                priority
               />
             </motion.div>
 
             {/* Action Buttons */}
-            <div className="mt-60"> {/* Increased space from cab image */}
-              <button className="col-span-2 w-full text-white py-5 px-10 rounded-lg bg-blue-500 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500">
-                Book a Cab
-              </button>
-              <button className="col-span-2 w-full mt-6 text-white py-5 px-10 rounded-lg bg-blue-500 transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500">
-                Plan a Tour
-              </button>
+            <div className="mt-60 relative z-10">
+              <a
+                href="https://wa.me/917637838415"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="col-span-2 w-full text-white py-5 px-10 rounded-lg bg-blue-500 transition duration-150 hover:bg-blue-600 active:bg-blue-700">
+                  Book a Cab
+                </button>
+              </a>
+              <a
+                href="https://wa.me/917637838415"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="col-span-2 w-full mt-6 text-white py-5 px-10 rounded-lg bg-blue-500 transition duration-150 hover:bg-blue-600 active:bg-blue-700">
+                  Plan a Tour
+                </button>
+              </a>
             </div>
           </div>
         </div>
